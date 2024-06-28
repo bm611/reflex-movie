@@ -23,6 +23,7 @@ class State(rx.State):
     ]
 
 
+@rx.page(route="/", title="Movie Flix")
 def index() -> rx.Component:
     # Welcome Page (Index)
     return rx.center(
@@ -60,4 +61,3 @@ app = rx.App(
     ],
     style=style,
 )
-app.add_page(index)

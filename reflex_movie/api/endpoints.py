@@ -5,6 +5,8 @@ import json
 
 API_KEY = os.environ["API_KEY"]
 
+# url = "https://api.themoviedb.org/3/movie/550?api_key="
+
 
 def get_popular():
 
