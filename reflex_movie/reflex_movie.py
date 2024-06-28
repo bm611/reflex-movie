@@ -25,19 +25,21 @@ class State(rx.State):
 
 def index() -> rx.Component:
     # Welcome Page (Index)
-    return rx.container(
-        rx.color_mode.button(position="top-right"),
-        # nav bar
-        nav(),
-        # search bar
-        search(),
-        # display popular movies
-        rx.heading("Popular Movies", class_name="text-left font-bold"),
-        movie_grid(State.movies),
-        # rx.unordered_list(rx.foreach(State.movies, lambda item: rx.list_item(item))),
-        # reflex logo footer
-        rx.logo(),
-        class_name="",
+    return rx.center(
+        rx.vstack(
+            rx.color_mode.button(position="top-right"),
+            # nav bar
+            nav(),
+            # search bar
+            search(),
+            # display popular movies
+            rx.heading("Popular Movies", class_name="text-center mb-4 font-bold"),
+            movie_grid(State.movies),
+            # reflex logo footer
+            rx.logo(),
+            class_name="w-full max-w-7xl p-4 space-y-4",
+        ),
+        width="100%",
     )
 
 
