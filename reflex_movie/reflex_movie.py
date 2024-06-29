@@ -4,6 +4,7 @@ import reflex as rx
 from reflex_movie.components.search_bar import search
 from reflex_movie.components.nav import nav
 from reflex_movie.components.movie_card import movie_card, movie_grid
+from reflex_movie.components.movie_details import render_movie_details
 from reflex_movie.api.endpoints import get_popular, get_movie_details
 
 from rxconfig import config
@@ -32,9 +33,9 @@ class State(rx.State):
     def fetch_movie_details(self) -> None:
         movie_id = self.get_movie_id
         if movie_id:
-            movie = get_movie_details(movie_id)  # Assuming this function exists
+            movie = get_movie_details(movie_id)
             self.current_movie_details = {
-                "bg_image": f"https://image.tmdb.org/t/p/w500/{movie['backdrop_path']}",
+                "bg_image": f"https://image.tmdb.org/t/p/original/{movie['backdrop_path']}",
                 "runtime": movie["runtime"],
                 "budget": movie["budget"],
                 "rating": movie["vote_average"],
@@ -70,7 +71,8 @@ def display_details() -> rx.Component:
         rx.vstack(
             rx.color_mode.button(position="top-right"),
             nav(),
-            rx.image(State.current_movie_details["bg_image"]),
+            render_movie_details(State),
+            class_name="w-full max-w-7xl p-4 space-y-4",
         )
     )
 
