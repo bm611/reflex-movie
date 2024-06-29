@@ -4,7 +4,7 @@ import reflex as rx
 from reflex_movie.components.search_bar import search
 from reflex_movie.components.nav import nav
 from reflex_movie.components.movie_card import movie_card, movie_grid
-from reflex_movie.api.endpoints import get_popular
+from reflex_movie.api.endpoints import get_popular, get_movie_details
 
 from rxconfig import config
 from typing import Dict, List
@@ -23,9 +23,24 @@ class State(rx.State):
         for movie in get_popular()
     ]
 
+    current_movie_details: Dict[str, str] = {}
+
     @rx.var
     def get_movie_id(self) -> str:
         return self.router.page.params.get("movie_id", "")
+
+    def fetch_movie_details(self) -> None:
+        movie_id = self.get_movie_id
+        if movie_id:
+            movie = get_movie_details(movie_id)  # Assuming this function exists
+            self.current_movie_details = {
+                "bg_image": f"https://image.tmdb.org/t/p/w500/{movie['backdrop_path']}",
+                "runtime": movie["runtime"],
+                "budget": movie["budget"],
+                "rating": movie["vote_average"],
+            }
+        else:
+            self.current_movie_details = {}
 
 
 @rx.page(route="/", title="Movie Flix")
@@ -49,12 +64,13 @@ def index() -> rx.Component:
     )
 
 
-@rx.page(route="/movie/[movie_id]")
+@rx.page(route="/movie/[movie_id]", on_load=State.fetch_movie_details)
 def display_details() -> rx.Component:
     return rx.center(
         rx.vstack(
             rx.color_mode.button(position="top-right"),
             nav(),
+            rx.image(State.current_movie_details["bg_image"]),
         )
     )
 

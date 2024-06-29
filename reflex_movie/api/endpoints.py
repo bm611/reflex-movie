@@ -21,12 +21,14 @@ def get_popular():
 
 def get_movie_details(movie_id: str):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}"
+    data = {}
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
+        print(data)
     else:
         print("API ERROR")
-    return data["results"]
+    return data
 
 
 # res = get_popular()
