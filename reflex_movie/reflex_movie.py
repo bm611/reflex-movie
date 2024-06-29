@@ -18,9 +18,14 @@ class State(rx.State):
             "name": movie["original_title"],
             "release_date": movie["release_date"],
             "poster": f"https://image.tmdb.org/t/p/w500/{movie['poster_path']}",
+            "movie_id": movie["id"],
         }
         for movie in get_popular()
     ]
+
+    @rx.var
+    def get_movie_id(self) -> str:
+        return self.router.page.params.get("movie_id", "")
 
 
 @rx.page(route="/", title="Movie Flix")
@@ -41,6 +46,16 @@ def index() -> rx.Component:
             class_name="w-full max-w-7xl p-4 space-y-4",
         ),
         width="100%",
+    )
+
+
+@rx.page(route="/movie/[movie_id]")
+def display_details() -> rx.Component:
+    return rx.center(
+        rx.vstack(
+            rx.color_mode.button(position="top-right"),
+            nav(),
+        )
     )
 
 
