@@ -3,9 +3,14 @@
 import reflex as rx
 from reflex_movie.components.search_bar import search
 from reflex_movie.components.nav import nav
-from reflex_movie.components.movie_card import movie_card, movie_grid
+from reflex_movie.components.movie_card import movie_grid
 from reflex_movie.components.movie_details import render_movie_details
-from reflex_movie.api.endpoints import get_popular, get_movie_details
+from reflex_movie.components.search_details import render_search_results
+from reflex_movie.api.endpoints import (
+    get_popular,
+    get_movie_details,
+    get_search_results,
+)
 
 from rxconfig import config
 from typing import Dict, List
@@ -43,6 +48,23 @@ class State(rx.State):
         else:
             self.current_movie_details = {}
 
+    @rx.var
+    def get_search_query(self) -> str:
+        return self.router.page.params.get("query", "")
+
+    def fetch_search_details(self):
+        if self.get_search_query:
+            print("flag", self.get_search_query)
+            movies: List[Dict[str, str]] = [
+                {
+                    "name": movie["original_title"],
+                    "release_date": movie["release_date"],
+                    "poster": f"https://image.tmdb.org/t/p/w500/{movie['poster_path']}",
+                    "movie_id": movie["id"],
+                }
+                for movie in get_search_results(self.get_search_query)
+            ]
+
 
 @rx.page(route="/", title="Movie Flix")
 def index() -> rx.Component:
@@ -59,7 +81,7 @@ def index() -> rx.Component:
             movie_grid(State.movies),
             # reflex logo footer
             rx.logo(),
-            class_name="w-full max-w-7xl p-4 space-y-4",
+            class_name="w-full max-w-7xl p-6 space-y-4",
         ),
         width="100%",
     )
@@ -73,6 +95,23 @@ def display_details() -> rx.Component:
             nav(),
             render_movie_details(State),
             class_name="w-full max-w-7xl p-4 space-y-4",
+        )
+    )
+
+
+@rx.page(route="/search/[query]", on_load=State.fetch_search_details)
+def display_search_details() -> rx.Component:
+    return rx.center(
+        rx.vstack(
+            rx.color_mode.button(position="top-right"),
+            # nav bar
+            nav(),
+            # search bar
+            search(),
+            rx.heading(State.get_search_query),
+            rx.heading("Search Results", class_name="text-center mb-4 font-bold"),
+            # movie_grid(State.movies),
+            rx.logo(),
         )
     )
 
